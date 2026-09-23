@@ -117,4 +117,4 @@ name or a custom domain without editing anything else.
 ## Custom domain (optional)
 
 If you have your own domain, add it under **Settings → Pages → Custom
-domain**, then point your domain's DNS at GitHub Pages per their docs.
+domain**, then point your domain's DNS at GitHub Pages per their docs.-ـ
