@@ -12,7 +12,6 @@ const arrowIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19
 // ---- EDIT THESE TWO LINES with your real links ----
 const INSTAGRAM_URL = "https://www.instagram.com/rezacrat/";
 const BOOKING_EMBED_URL = "https://calendar.google.com/calendar/appointments/schedules/AcZssZ0aeoI-y-MW3hjiJDjZG8ovY3lCsjLP90xoLe8cdyIS4jDyedGo2o9mO4NhVQlQTTt0xOc_SxMR?gv=true";
-<!-- end Google Calendar Appointment Scheduling -->"; // paste your Calendly / Google Calendar appointment-schedule embed link here
 // ----------------------------------------------------
 
 function escapeHTML(str) {
