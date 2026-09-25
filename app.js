@@ -140,7 +140,7 @@ function setupCaptionToggles() {
     // clientHeight (the clamp already limits layout, not just paint), so the
     // usual scrollHeight > clientHeight check never fires. Instead: read the
     // clamped height, briefly lift the clamp to measure the true full height,
-    // then put it back — a one-frame, invisible measurement.
+    // then put it back, a one-frame, invisible measurement.
     const clampedHeight = textEl.clientHeight;
     textEl.style.setProperty("-webkit-line-clamp", "unset");
     textEl.style.display = "block";
@@ -161,7 +161,7 @@ function setupCaptionToggles() {
 }
 
 if (!isAbout) {
-  // measure only after the real font has loaded — measuring against the
+  // measure only after the real font has loaded, measuring against the
   // fallback font first can give a wrong line-count that flips once
   // Space Grotesk/DM Sans swap in, showing/hiding "more" incorrectly
   const measureCaptions = () => requestAnimationFrame(() => requestAnimationFrame(setupCaptionToggles));
@@ -416,9 +416,9 @@ if (isAbout) {
   const previewVideos = [...document.querySelectorAll(".project-video")];
 
   // if a video file is missing/unreachable, mark its card instead of
-  // leaving a broken, blank-looking box — .is-empty gets a subtle CSS treatment.
+  // leaving a broken, blank-looking box. is-empty gets a subtle CSS treatment.
   // Note: a load failure fires "error" on the <source> child, not the <video>
-  // element, and that event does not bubble — so we listen on <source> directly.
+  // element, and that event does not bubble, so we listen on <source> directly.
   previewVideos.forEach((video) => {
     const sourceEl = video.querySelector("source");
     sourceEl?.addEventListener("error", () => {
