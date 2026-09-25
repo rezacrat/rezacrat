@@ -22,30 +22,30 @@ window.PROJECTS = [
     title: "Project 1",
     file: "media/1.mp4",
     poster: "media/project-1.webp",
-    caption: "for:  Portfolio Video editing for Instagram Reels."
+    caption: "for:  Portfolio, Video editing for Instagram Reels."
   },
   {
     title: "Project 2",
     file: "media/2.mp4",
     poster: "media/project-2.webp",
-    caption: "for:  Portfolio Video editing for Instagram Reels."
+    caption: "for:  Portfolio, Video editing for Instagram Reels."
   },
   {
     title: "Project 3",
     file: "media/3.mp4",
     poster: "media/project-3.webp",
-    caption: "for:  Reza Rezaei Video editing for Instagram Reels."
+    caption: "for:  Reza Rezaei, Video editing for Instagram Reels."
   },
   {
     title: "Project 4",
     file: "media/4.mp4",
     poster: "media/project-4.webp",
-    caption: "for:  Reza Rezaei Video editing for Instagram Reels."
+    caption: "for:  Reza Rezaei, Video editing for Instagram Reels."
   },
   {
     title: "Project 5",
     file: "media/5.mp4",
     poster: "media/project-5.webp",
-    caption: "for:  Devin Jatho Video editing for Instagram Reels."
+    caption: "for:  Devin Jatho, Video editing for Instagram Reels."
   },
 ];
