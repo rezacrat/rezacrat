@@ -44,7 +44,7 @@ window.PROJECTS = [
   },
   {
     title: "Project title 5",
-    file: "media/project-5.mp4",
+    file: "media/5.mp4",
     poster: "media/project-5.webp",
     caption: "Fifth project caption goes here."
   },
