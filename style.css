@@ -61,13 +61,15 @@ header {
 
 .section-label {
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
   justify-content: space-between;
+  gap: 16px;
   margin: 6px 0 23px;
 }
 
-.section-label h1 { margin: 0; font-size: 16px; font-weight: 500; }
-.section-label span { color: var(--muted); font-size: 13px; }
+.section-label h1 { margin: 0 0 4px; font-size: 16px; font-weight: 500; }
+.section-label .section-sub { margin: 0; color: var(--muted); font-size: 14px; }
+.section-label .count { color: var(--muted); font-size: 13px; white-space: nowrap; }
 
 .grid {
   display: grid;
@@ -97,7 +99,14 @@ header {
   width: 100%;
   aspect-ratio: 16 / 9;
   border-radius: 9px;
-  background: #151515;
+  background: radial-gradient(circle at 30% 20%, #1c1c1c, #101010 70%);
+}
+
+.art.is-empty::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(0,91,210,.10), transparent 65%);
 }
 
 .project-video {
@@ -140,14 +149,7 @@ header {
 
 .project-info { padding: 13px 2px 0; }
 
-.project-meta {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-}
-
 .project-meta h2 { margin: 0; font-size: 15px; font-weight: 500; }
-.project-meta span { color: #777; font-size: 13px; text-align: right; white-space: nowrap; }
 
 /* caption block — Instagram/YouTube-style truncate + expand */
 .project-caption { margin-top: 7px; }
@@ -179,6 +181,8 @@ header {
   font-weight: 500;
   cursor: pointer;
 }
+
+.caption-toggle[hidden] { display: none; }
 
 .caption-toggle:hover { text-decoration: underline; }
 
@@ -226,8 +230,9 @@ header {
 
 .video-dialog {
   overflow: visible;
-  width: min(1120px, calc(100% - 48px));
-  max-width: none;
+  width: fit-content;
+  min-width: min(360px, 92vw);
+  max-width: min(1120px, 92vw);
   margin: auto;
   padding: 0;
   border: 1px solid #323232;
@@ -243,26 +248,35 @@ header {
   backdrop-filter: blur(9px);
 }
 
+/* The video keeps its own native width/height (up to these caps) instead of
+   being forced into a fixed 16:9 box — a vertical Reel opens tall and narrow,
+   a widescreen edit opens wide, matching how it was actually shot/exported. */
 .dialog-video-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
-  width: 100%;
-  aspect-ratio: 16 / 9;
+  min-height: 200px;
+  max-height: 80vh;
   border-radius: 17px 17px 0 0;
   background: #000;
 }
 
-.dialog-video { display: block; width: 100%; height: 100%; object-fit: contain; }
+.dialog-video {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: min(1120px, 92vw);
+  max-height: 80vh;
+}
 
 .dialog-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
   padding: 19px 22px 20px;
 }
 
 .dialog-meta h2 { margin: 0; font-size: 18px; font-weight: 500; }
-.dialog-meta p { margin: 0; color: #777; font-size: 14px; }
+.dialog-meta p { margin: 8px 0 0; color: #999; font-size: 14px; line-height: 1.6; }
+.dialog-meta p:empty { display: none; }
 
 .dialog-close {
   position: absolute;
@@ -318,6 +332,39 @@ header {
 .bio { margin: 0; color: #aaa; font-size: 18px; line-height: 1.75; }
 .bio strong { color: #eee; font-weight: 400; }
 .tools { margin-top: 25px; color: #777; font-size: 13px; }
+
+.how-it-works {
+  margin-top: 60px;
+  padding-top: 40px;
+  border-top: 1px solid #292929;
+}
+
+.how-it-works h2 {
+  margin: 0 0 30px;
+  font-family: 'Space Grotesk', Arial, sans-serif;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.how-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.how-step { min-width: 0; }
+
+.how-step .step-number {
+  display: inline-block;
+  margin-bottom: 14px;
+  color: var(--blue-hover);
+  font-family: 'Space Grotesk', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.how-step h3 { margin: 0 0 8px; font-size: 16px; font-weight: 500; }
+.how-step p { margin: 0; color: #888; font-size: 14px; line-height: 1.6; }
 
 .call-area {
   display: flex;
@@ -463,13 +510,14 @@ header {
   .art { border-radius: 8px; }
   .project-info { padding: 11px 2px 0; }
   .project-meta h2 { font-size: 14px; }
-  .project-meta span { font-size: 12px; }
   .play-indicator { width: 47px; height: 47px; opacity: .92; transform: translate(-50%, -50%) scale(1); }
   .bottom-nav { bottom: max(20px, env(safe-area-inset-bottom)); padding: 6px; }
   .bottom-nav a { min-width: 125px; height: 54px; }
   .about { padding: 42px 24px 150px; }
   .about h1 { margin-bottom: 35px; font-size: 44px; }
   .about-lower { grid-template-columns: 1fr; gap: 30px; }
+  .how-it-works { margin-top: 44px; padding-top: 30px; }
+  .how-steps { grid-template-columns: 1fr; gap: 26px; }
   .bio { font-size: 17px; }
   .call-area { align-items: stretch; }
   .cta-row { flex-direction: column; }
@@ -482,11 +530,12 @@ header {
   .booking-header { min-height: 70px; padding: 12px 13px 12px 18px; }
   .booking-header h2 { font-size: 18px; }
   .booking-close { width: 40px; height: 40px; }
-  .video-dialog { width: calc(100% - 24px); border-radius: 13px; }
+  .video-dialog { min-width: 0; max-width: calc(100% - 24px); border-radius: 13px; }
   .dialog-video-wrap { border-radius: 12px 12px 0 0; }
-  .dialog-meta { display: block; padding: 15px 16px 17px; }
+  .dialog-video { max-width: calc(100vw - 24px); max-height: 70vh; }
+  .dialog-meta { padding: 15px 16px 17px; }
   .dialog-meta h2 { font-size: 16px; }
-  .dialog-meta p { margin-top: 5px; font-size: 12px; }
+  .dialog-meta p { font-size: 13px; }
   .dialog-close { top: -15px; right: -6px; }
 }
 

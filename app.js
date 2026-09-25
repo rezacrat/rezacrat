@@ -1,6 +1,6 @@
 const pagePath = location.pathname.replace(/\/$/, "");
 const isAbout = pagePath.endsWith("/about");
-const projectType = "Educational Content Editing";
+const serviceLine = "Short-form edits for online educators";
 const projects = window.PROJECTS || [];
 
 const workIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>';
@@ -23,8 +23,8 @@ function escapeHTML(str) {
 const projectCards = projects.map((project, index) => `
   <article class="project">
     <button class="project-open" type="button" data-project="${index}" aria-label="Play ${escapeHTML(project.title)}">
-      <span class="art">
-        <video class="project-video" muted loop playsinline preload="metadata" poster="${project.poster}" aria-hidden="true">
+      <span class="art" id="art-${index}">
+        <video class="project-video" data-index="${index}" muted loop playsinline preload="metadata" poster="${project.poster}" aria-hidden="true">
           <source src="${project.file}" type="video/mp4">
         </video>
         <span class="play-indicator">${playIcon}</span>
@@ -33,7 +33,6 @@ const projectCards = projects.map((project, index) => `
     <div class="project-info">
       <div class="project-meta">
         <h2>${escapeHTML(project.title)}</h2>
-        <span>${projectType}</span>
       </div>
       <div class="project-caption">
         <p class="caption-text" id="caption-${index}">${escapeHTML(project.caption || "")}</p>
@@ -46,8 +45,11 @@ const projectCards = projects.map((project, index) => `
 const workPage = `
   <main class="work">
     <div class="section-label">
-      <h1>Selected work</h1>
-      <span>01 — ${String(projects.length).padStart(2, "0")}</span>
+      <div>
+        <h1>Selected work</h1>
+        <p class="section-sub">${serviceLine}</p>
+      </div>
+      <span class="count">01 — ${String(projects.length).padStart(2, "0")}</span>
     </div>
     <div class="grid">${projectCards}</div>
   </main>
@@ -58,7 +60,7 @@ const workPage = `
     </div>
     <div class="dialog-meta">
       <h2 id="projectTitle"></h2>
-      <p>${projectType}</p>
+      <p id="projectCaption"></p>
     </div>
   </dialog>
 `;
@@ -80,6 +82,26 @@ const aboutPage = `
         </div>
       </div>
     </div>
+    <div class="how-it-works">
+      <h2>How it actually works</h2>
+      <div class="how-steps">
+        <div class="how-step">
+          <span class="step-number">01</span>
+          <h3>Send me the raw lesson</h3>
+          <p>A screen recording, a Zoom call, a phone clip — whatever you've already got. No need to shoot anything special first.</p>
+        </div>
+        <div class="how-step">
+          <span class="step-number">02</span>
+          <h3>I cut it for retention</h3>
+          <p>I watch it once as a stranger would, then edit for where people actually drop off — not just where it looks good.</p>
+        </div>
+        <div class="how-step">
+          <span class="step-number">03</span>
+          <h3>You get something to post</h3>
+          <p>Captions, pacing, sound — done. You review it, ask for tweaks if needed, and it's ready to go up.</p>
+        </div>
+      </div>
+    </div>
   </main>
   <dialog class="booking-dialog" id="booking" aria-labelledby="bookingTitle">
     <div class="booking-header">
@@ -98,7 +120,7 @@ const aboutPage = `
 document.querySelector("#app").innerHTML = `
   <header>
     <a class="brand" href="${isAbout ? "../" : "./"}" aria-label="rezacrat home">rezacrat<span>.</span></a>
-    <div class="header-note"><span>Short-form editor</span>Reels · TikTok · Shorts</div>
+    <div class="header-note"><span>Reza</span>Editing for people who teach online</div>
   </header>
   ${isAbout ? aboutPage : workPage}
   <nav class="bottom-nav" aria-label="Main navigation">
@@ -114,14 +136,23 @@ function setupCaptionToggles() {
     const textEl = document.querySelector(`#caption-${index}`);
     if (!textEl) return;
 
-    // only show the toggle if the caption is actually overflowing two lines
-    const isOverflowing = textEl.scrollHeight > textEl.clientHeight + 1;
-    if (!isOverflowing) {
-      button.hidden = true;
-      return;
-    }
-    button.hidden = false;
+    // With -webkit-line-clamp active, scrollHeight reports the same value as
+    // clientHeight (the clamp already limits layout, not just paint), so the
+    // usual scrollHeight > clientHeight check never fires. Instead: read the
+    // clamped height, briefly lift the clamp to measure the true full height,
+    // then put it back — a one-frame, invisible measurement.
+    const clampedHeight = textEl.clientHeight;
+    textEl.style.setProperty("-webkit-line-clamp", "unset");
+    textEl.style.display = "block";
+    const fullHeight = textEl.scrollHeight;
+    textEl.style.removeProperty("-webkit-line-clamp");
+    textEl.style.removeProperty("display");
 
+    const isOverflowing = fullHeight > clampedHeight + 1;
+    button.hidden = !isOverflowing;
+    if (!isOverflowing || button.dataset.bound) return;
+
+    button.dataset.bound = "true";
     button.addEventListener("click", () => {
       const expanded = textEl.classList.toggle("expanded");
       button.textContent = expanded ? "less" : "more";
@@ -130,8 +161,15 @@ function setupCaptionToggles() {
 }
 
 if (!isAbout) {
-  // measure after layout settles (fonts, video posters etc. can shift line height)
-  requestAnimationFrame(() => requestAnimationFrame(setupCaptionToggles));
+  // measure only after the real font has loaded — measuring against the
+  // fallback font first can give a wrong line-count that flips once
+  // Space Grotesk/DM Sans swap in, showing/hiding "more" incorrectly
+  const measureCaptions = () => requestAnimationFrame(() => requestAnimationFrame(setupCaptionToggles));
+  if (document.fonts?.ready) {
+    document.fonts.ready.then(measureCaptions).catch(measureCaptions);
+  } else {
+    measureCaptions();
+  }
   window.addEventListener("resize", () => {
     document.querySelectorAll(".caption-text.expanded").forEach((el) => el.classList.remove("expanded"));
     document.querySelectorAll(".caption-toggle").forEach((btn) => { btn.textContent = "more"; });
@@ -168,13 +206,15 @@ const setupHalftoneCursor = () => {
   const textSelector = [
     ".header-note",
     ".section-label h1",
-    ".section-label span",
+    ".section-label .section-sub",
+    ".section-label .count",
     ".project-meta h2",
-    ".project-meta span",
     ".caption-text",
     ".eyebrow",
     ".about h1",
     ".bio",
+    ".how-step h3",
+    ".how-step p",
     ".tools",
     ".call-area p",
   ].join(", ");
@@ -372,7 +412,19 @@ if (isAbout) {
   const modal = document.querySelector("#projectPlayer");
   const fullVideo = document.querySelector("#fullVideo");
   const modalTitle = document.querySelector("#projectTitle");
+  const modalCaption = document.querySelector("#projectCaption");
   const previewVideos = [...document.querySelectorAll(".project-video")];
+
+  // if a video file is missing/unreachable, mark its card instead of
+  // leaving a broken, blank-looking box — .is-empty gets a subtle CSS treatment.
+  // Note: a load failure fires "error" on the <source> child, not the <video>
+  // element, and that event does not bubble — so we listen on <source> directly.
+  previewVideos.forEach((video) => {
+    const sourceEl = video.querySelector("source");
+    sourceEl?.addEventListener("error", () => {
+      document.querySelector(`#art-${video.dataset.index}`)?.classList.add("is-empty");
+    });
+  });
 
   const playVisiblePreviews = () => {
     if (modal.open || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -398,6 +450,7 @@ if (isAbout) {
       if (!project) return;
       previewVideos.forEach((video) => video.pause());
       modalTitle.textContent = project.title;
+      modalCaption.textContent = project.caption || "";
       fullVideo.poster = project.poster;
       fullVideo.src = project.file;
       document.body.classList.add("modal-open");
